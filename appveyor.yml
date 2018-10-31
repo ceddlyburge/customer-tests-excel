@@ -1,0 +1,33 @@
+configuration:
+  - Release
+before_build:
+  - nuget restore "CustomerTestsExcel.sln" -verbosity quiet
+  # build GenerateCodeFromExcelTest.exe, which is used by GenerateTests.bat
+  - msbuild CustomerTestsExcel.sln /verbosity:minimal /property:Configuration=Release   
+  # Ensure that the Excel tests can round trip to C#
+  # Regenerate the sample tests from the excel (requires GenerateCodeFromExcelTest.exe)
+  - GenerateTests.bat        
+  - msbuild CustomerTestsExcel.sln /verbosity:minimal /property:Configuration=Release
+  # run the tests, so that they re create the Excel Spreadsheets (requires some environment variables to be set)
+  - nunit3-console.exe Builtdlls\Release\SampleTests.dll 
+  # Regenerate the sample tests again. These are built / tested in the following "build" and "test_script"
+  - GenerateTests.bat
+build:
+  project: CustomerTestsExcel.sln   
+  verbosity: quiet
+  publish_nuget: true               # package projects with .nuspec files and push to artifacts
+  publish_nuget_symbols: true       # generate and publish NuGet symbol packages
+test:
+  assemblies:
+    except:
+      - CustomerTestsExcel.dll
+      - GenerateCodeFromExcelTest.dll
+      - SampleSystemUnderTest.dll
+notifications:
+  - provider: Email
+    to:
+      - '{{commitAuthorEmail}}'
+    subject: 'Build {{status}}'
+    on_build_success: false
+    on_build_failure: true
+    on_build_status_changed: true

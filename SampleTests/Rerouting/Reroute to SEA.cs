@@ -5,10 +5,11 @@ using System.Text;
 using NUnit.Framework;
 using CustomerTestsExcel;
 using System.Linq.Expressions;
+using SampleTests;
 
 using SampleSystemUnderTest;
 
-namespace SampleTestsRerouting
+namespace SampleTests.Rerouting
 {
     [TestFixture]
     public class Reroute_To_Sea : SpecificationBase<SpecificationSpecificRoutingService>, ISpecification<SpecificationSpecificRoutingService>
@@ -17,11 +18,6 @@ namespace SampleTestsRerouting
         {
             return "Reroute Cargo from HKG - DAL to HKG - SEA";
         }
-
-        //public override string TrunkRelativePath()
-        //{
-        //    return "SampleTests";
-        //}
 
         // arrange
         public override SpecificationSpecificRoutingService Given()
@@ -78,5 +74,6 @@ namespace SampleTestsRerouting
                 )
             };
         }
+        protected override string AssertionClassPrefixAddedByGenerator => "I";
     }
 }
